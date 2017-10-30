@@ -42,7 +42,7 @@ Create a Controller object.
 
 ### `grid_accounts(self, limit)`
 
-Accounts list.
+Tenants list.
 
  - `limit` -- limit the number accounts returned.
 
@@ -50,6 +50,8 @@ Accounts list.
 
 # TO DO
 
+others api
+pytestintegration
 
 License
 -------
