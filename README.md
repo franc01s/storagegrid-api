@@ -15,9 +15,11 @@ API Example
 
 ```python
 from storagegrid.controller import Controller
-c = Controller('192.168.1.99', 'admin', 'p4ssw0rd')
-for ap in c.get_aps():
-	print 'AP named %s with MAC %s' % (ap.get('name'), ap['mac'])
+
+c = Controller(host='host', username='user', password='passw0rd', verify=False)
+accounts = c.grid_accounts(100)
+for account in accounts:
+    print('id: {id} name: {name}'.format(id=account['id'], name=account['name']))
 ```
 
 API

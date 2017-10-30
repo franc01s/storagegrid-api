@@ -70,7 +70,8 @@ class Controller:
         """
 
         log.debug('grid_accounts() limit {limit}'.format(limit=limit))
-        headers = {'Authorization': 'Bearer ' + self.token}
+        bearer = 'Bearer {}'.format(self.token)
+        headers = {'Authorization': bearer}
         params = {'limit': limit}
 
         res = self.session.get(self.api_url + '/grid/accounts', headers=headers, params=params)
