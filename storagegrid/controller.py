@@ -11,6 +11,30 @@ class APIError(Exception):
     pass
 
 
+class Account:
+    def __init__(self, id, name, capabilities, policy):
+        self._id = id
+        self._name = name
+        self._capabilities = capabilities
+        self._policy = policy
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def capabilities(self):
+        return self._capabilities
+
+    @property
+    def policy(self):
+        return self._policy
+
+
 class Controller:
     """Interact with a Storagegrid admin node.
 
@@ -63,10 +87,10 @@ class Controller:
         log.debug('logout()')
         self.opener.get(self.url + 'logout')
 
-    def grid_accounts(self, limit):
+    def get_tenants(self, limit):
         """"
-        Unblock a client device
-        required parameter <mac>     = client MAC address
+        List tenants
+        required parameter <limit>     = max tenants returned
         """
 
         log.debug('grid_accounts() limit {limit}'.format(limit=limit))
@@ -75,5 +99,36 @@ class Controller:
         params = {'limit': limit}
 
         res = self.session.get(self.api_url + '/grid/accounts', headers=headers, params=params)
+        accounts = []
+        for account in res.json()['data']:
+            accountobj = Account(account.get('id', None), account.get('name', None), account.get('capabilities', None),
+                                 account.get('policy', None))
+            accounts.append(accountobj)
 
-        return res.json()['data']
+        return accounts
+
+    def create_tenant(self, name, capabilities=['s3'], policy={"useAccountIdentitySource": True,
+                                                                             "allowPlatformServices": False,
+                                                                             "quotaObjectBytes": None},
+                      password='passsuperSecret'):
+        """"
+        Create one tenant
+        required parameter <name>    = name of tenant
+        optionnal parameter <capabilities>    = capabilities
+        optionnal parameter <policy>    = policy
+        optionnal parameter <password>   = name of tenant
+        """
+
+        log.debug('create_tenant()  {name}'.format(name=name))
+        bearer = 'Bearer {}'.format(self.token)
+        headers = {'Authorization': bearer}
+        params = {
+            "name": "Widgets Unlimited",
+            "capabilities": capabilities,
+            "policy": policy,
+            "password": password
+        }
+
+        res = self.session.post(self.api_url + '/grid/accounts', headers=headers, json=params)
+
+        return res.status_code, res.json().get('errors', None)
